@@ -1,5 +1,6 @@
-## MÃ©taheuristiques en optimisation - TP 2
+## Métaheuristiques en optimisation - TP 2
 
-Simon Bar & Thomas DÃ©fossez
+Simon Bar & Thomas Défossez
 
-ImplÃ©mentation de SPEA2 et de NGSA II avec Matlab.
+Implémentation de SPEA2 et de NGSA II avec Matlab.
+Tests avec des problèmes connus (par exemple ZDT{1..6}).
