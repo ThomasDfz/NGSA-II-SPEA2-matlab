@@ -71,14 +71,3 @@ function result = ngsa(problem, config)
     
     result = offspring;
 end
-
-function [objectivesValues, ranks] = evalPop(pop, problem)
-    [N, ~] = size(pop);
-    objectivesValues = zeros(N, problem.objCount);
-
-    for o = 1:problem.objCount
-        objectivesValues(:, o) = problem.objectives{o}(pop);
-    end
-    
-    ranks = fastNonDominatedSort(objectivesValues);
-end
