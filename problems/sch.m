@@ -1,4 +1,5 @@
 function p = sch()
+% SCH  SCH problem
     p.varCount = 1;
     p.objCount = 2;
     p.objectives = {@sch1 @sch2};

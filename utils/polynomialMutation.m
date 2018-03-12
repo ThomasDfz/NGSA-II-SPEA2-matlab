@@ -3,17 +3,20 @@ function pop = polynomialMutation(pop, mutateProb, args)
 %   The argument needed is n.
 
     n = args(1);
+    [N, M] = size(pop);
     
-    for i = 1:length(pop)    
-        if (rand < mutateProb) 
-            u = rand;
-            if u < 0.5
-                ksi = (2*u) ^ (1/(n + 1)) - 1; 
-            elseif u >= 0.5
-                ksi = 1 - (2*(1 - u)) ^ (1/(n+1));
+    for m = 1:M
+        for i = 1:N    
+            if (rand < mutateProb) 
+                u = rand;
+                if u < 0.5
+                    ksi = (2*u) ^ (1/(n + 1)) - 1; 
+                elseif u >= 0.5
+                    ksi = 1 - (2*(1 - u)) ^ (1/(n+1));
+                end
+
+                pop(i, m) = pop(i, m) + ksi; 
             end
-            
-            pop(i) = pop(i) + ksi; 
         end
     end
 end

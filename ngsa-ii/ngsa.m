@@ -16,7 +16,7 @@ function result = ngsa(problem, config)
             R = [pop; offspring];
             [objectivesValuesR, ranksR] = evalPop(R, problem);
             
-            nextPop = zeros(N, problem.varCount);
+            nextPop = zeros(N, 1);
             i = 1;
             newPopCount = 0;
             frontIndices = find(ranksR == i);
@@ -46,13 +46,25 @@ function result = ngsa(problem, config)
                 frontIndices = find(ranksR == i);
                 frontCount = length(frontIndices);
             end
-                        
+            
             if (newPopCount < N)
-                remainingCount = N - newPopCount;
-                [~, sortedIndices] = mink(-distances, remainingCount);
-                absoluteIndices = frontIndices(sortedIndices);
-                remainingInterval = (newPopCount:(newPopCount + length(absoluteIndices)));
-                nextPop(remainingInterval) = absoluteIndices;
+                fillingFrontIndex = i - 1;
+                
+                while (newPopCount < N)
+                    frontIndices = find(ranksR == fillingFrontIndex);
+
+                    % Calculate how many individual are missing.
+                    remainingCount = N - newPopCount;
+                    
+                    % Find the best ones available.
+                    [~, sortedIndices] = mink(-distances, remainingCount);
+                    absoluteIndices = frontIndices(sortedIndices);
+
+                    % Add them.
+                    remainingInterval = (newPopCount + 1):(newPopCount + length(absoluteIndices));
+                    nextPop(remainingInterval) = absoluteIndices;
+                    newPopCount = newPopCount + length(absoluteIndices);
+                end
             end
             
             pop = offspring;
