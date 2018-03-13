@@ -48,23 +48,20 @@ function result = ngsa(problem, config)
             end
             
             if (newPopCount < N)
-                fillingFrontIndex = i - 1;
-                
-                while (newPopCount < N)
-                    frontIndices = find(ranksR == fillingFrontIndex);
+                % Recompute distances.
+                distances = crowdingDistanceAssignment(objectivesValuesR(frontIndices, :));
 
-                    % Calculate how many individual are missing.
-                    remainingCount = N - newPopCount;
-                    
-                    % Find the best ones available.
-                    [~, sortedIndices] = mink(-distances, remainingCount);
-                    absoluteIndices = frontIndices(sortedIndices);
+                % Calculate how many individual are missing.
+                remainingCount = N - newPopCount;
 
-                    % Add them.
-                    remainingInterval = (newPopCount + 1):(newPopCount + length(absoluteIndices));
-                    nextPop(remainingInterval) = absoluteIndices;
-                    newPopCount = newPopCount + length(absoluteIndices);
-                end
+                % Find the best ones available.
+                [~, sortedIndices] = mink(-distances, remainingCount);
+                absoluteIndices = frontIndices(sortedIndices);
+
+                % Add them.
+                remainingInterval = (newPopCount + 1):(newPopCount + length(absoluteIndices));
+                nextPop(remainingInterval) = absoluteIndices;
+                newPopCount = newPopCount + length(absoluteIndices);
             end
             
             pop = offspring;
@@ -77,7 +74,7 @@ function result = ngsa(problem, config)
         % Crossover and mutation.
         offspring = simulatedBinaryCrossover(offspring, config.pc, config.crossArgs);
         offspring = polynomialMutation(offspring, config.pm, config.mutationArgs);
-                
+        
         g = g + 1;
     end
     
