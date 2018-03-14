@@ -4,6 +4,7 @@ function p = kur()
     p.objCount = 2;
     p.objectives = {@kur1 @kur2};
     p.boundaries = [-5 5];
+    p.name = 'KUR';
 end
 
 function o = kur1(args)

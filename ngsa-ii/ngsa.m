@@ -1,10 +1,26 @@
-function result = ngsa(problem, config)
+function [result, distancesMeans] = ngsa(problem, config)
 % NGSA  Execute the NSGA-II algorithm. Minimization of fitness is assumed.
     N = config.N;
     g = 1;
-    
+    optimalAvailable = isfield(problem, 'optimal');
+	distancesMeans = zeros(config.maxGen, 1);
+
     % Initial population.
     pop = initSolutionPopulation(N, problem.varCount, problem.boundaries);
+    
+    if (optimalAvailable)
+        % Optimal solutions (for distance computation per generation)
+        optimalLinspace = zeros(problem.varCount, 1000);
+        optimalValues = zeros(1000, problem.objCount);
+
+        for v = 1:problem.varCount
+            optimalLinspace(v, :) = linspace(problem.optimal(v, 1), problem.optimal(v, 2), 1000);
+        end
+
+        for o = 1:problem.objCount
+            optimalValues(:, o) = problem.objectives{o}(optimalLinspace');
+        end
+    end
     
     while (g <= config.maxGen)
         if (g == 1)
@@ -75,8 +91,32 @@ function result = ngsa(problem, config)
         offspring = simulatedBinaryCrossover(offspring, config.pc, config.crossArgs);
         offspring = polynomialMutation(offspring, config.pm, config.mutationArgs);
         
+        if (optimalAvailable)
+            % Distance computation.
+            distances = zeros(N, 1);
+            obtainedPareto = zeros(N, problem.objCount);
+            closest = zeros(N, problem.objCount);
+
+            for o = 1:problem.objCount
+                obtainedPareto(:, o) = problem.objectives{o}(pop);
+            end
+
+            % Find closest optimal values...
+            for n = 1:N
+                [closest(n, :), ~] = min(abs(optimalValues - obtainedPareto(n, :)));
+            end
+
+            % ...and compute distances.
+            for n = 1:N
+                distances(n) = min(sum((obtainedPareto(n, :) - closest).^2, 2));
+            end
+
+            distancesMeans(g) = mean(sqrt(distances));
+        end
+
         g = g + 1;
     end
     
-    result = offspring;
+    [~, ranks] = evalPop(pop, problem);
+    result = pop(ranks == 1, :);
 end

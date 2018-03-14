@@ -4,6 +4,9 @@ function p = fon()
     p.objCount = 2;
     p.objectives = {@fon1 @fon2};
     p.boundaries = [-4 4];
+    p.optimal = [-1/sqrt(3) 1/sqrt(3); -1/sqrt(3) 1/sqrt(3); ...
+        -1/sqrt(3) 1/sqrt(3)];
+    p.name = 'FON';
 end
 
 function o = fon1(args)

@@ -4,6 +4,8 @@ function p = sch()
     p.objCount = 2;
     p.objectives = {@sch1 @sch2};
     p.boundaries = [-1000 1000];
+    p.optimal = [0 2];
+    p.name = 'SCH';
 end
 
 function o = sch1(args)

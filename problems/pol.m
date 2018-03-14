@@ -4,6 +4,7 @@ function p = pol()
     p.objCount = 2;
     p.objectives = {@pol1 @pol2};
     p.boundaries = [-pi pi];
+    p.name = 'POL';
 end
 
 function o = pol1(args)
