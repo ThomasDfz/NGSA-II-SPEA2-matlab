@@ -13,3 +13,7 @@ config = geneticConfig(100, 250, 0.9, 1 / problem.varCount, ...
 % Draw graphes.
 drawGraphes(problem, resultNgsa, distancesNgsa, deltaNgsa);
 disp(resultNgsa);
+
+% Benchmark
+%r = benchmark(30, config);
+%disp(r);

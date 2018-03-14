@@ -22,4 +22,3 @@ function distances = crowdingDistanceAssignment(objectivesValues)
         end
     end
 end
-
