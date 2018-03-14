@@ -8,8 +8,8 @@ config = geneticConfig(100, 250, 0.9, 1 / problem.varCount, ...
     [2], [20 problem.boundaries], 20);
 
 % Execute NGSA-II.
-[resultNgsa, distancesNgsa] = ngsa(problem, config);
+[resultNgsa, distancesNgsa, deltaNgsa] = ngsa(problem, config);
 
 % Draw graphes.
-drawGraphes(problem, resultNgsa, distancesNgsa);
-disp(result);
+drawGraphes(problem, resultNgsa, distancesNgsa, deltaNgsa);
+disp(resultNgsa);

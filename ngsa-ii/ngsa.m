@@ -1,9 +1,10 @@
-function [result, distancesMeans] = ngsa(problem, config)
+function [result, distancesMeans, delta] = ngsa(problem, config)
 % NGSA  Execute the NSGA-II algorithm. Minimization of fitness is assumed.
     N = config.N;
     g = 1;
     optimalAvailable = isfield(problem, 'optimal');
 	distancesMeans = zeros(config.maxGen, 1);
+    delta = zeros(config.maxGen, 1);
 
     % Initial population.
     pop = initSolutionPopulation(N, problem.varCount, problem.boundaries);
@@ -91,8 +92,8 @@ function [result, distancesMeans] = ngsa(problem, config)
         offspring = simulatedBinaryCrossover(offspring, config.pc, config.crossArgs);
         offspring = polynomialMutation(offspring, config.pm, config.mutationArgs);
         
+        % Distance computation.
         if (optimalAvailable)
-            % Distance computation.
             distances = zeros(N, 1);
             obtainedPareto = zeros(N, problem.objCount);
             closest = zeros(N, problem.objCount);
@@ -113,10 +114,15 @@ function [result, distancesMeans] = ngsa(problem, config)
 
             distancesMeans(g) = mean(sqrt(distances));
         end
+        
+        % Diversity of solutions (delta computation).
+        [objValues, ranks] = evalPop(pop, problem);
+        delta(g) = computeDiversity(pop(ranks == 1, :), objValues(ranks == 1, :), optimalValues);
 
         g = g + 1;
     end
     
+    % Return only the non-dominated solutions.
     [~, ranks] = evalPop(pop, problem);
     result = pop(ranks == 1, :);
 end

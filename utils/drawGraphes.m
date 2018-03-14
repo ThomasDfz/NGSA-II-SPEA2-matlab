@@ -1,7 +1,8 @@
-function drawGraphes(problem, resultNgsa, distancesNgsa)
+function drawGraphes(problem, resultNgsa, distancesNgsa, deltaNgsa)
     [N, ~] = size(resultNgsa);
     optimalAvailable = isfield(problem, 'optimal');
     objectivesValues = zeros(N, problem.objCount);
+	[Gmax, ~] = size(deltaNgsa);
     
     if (optimalAvailable)
         optimalValues = zeros(N, problem.objCount);
@@ -25,7 +26,7 @@ function drawGraphes(problem, resultNgsa, distancesNgsa)
     
     % Pareto front (objective domain)
     if (optimalAvailable)
-        subplot(1, 2, 1);
+        subplot(2, 2, [1, 2]);
     end
 
     % Result front
@@ -43,17 +44,28 @@ function drawGraphes(problem, resultNgsa, distancesNgsa)
         legend('NGSA-II Pareto front', 'Optimal Pareto front');
         
         % Distance metric
-        subplot(1, 2, 2);
+        subplot(2, 2, 3);
+        
+        plot(linspace(1, Gmax, Gmax), log10(distancesNgsa), '-+');
 
-        [Gmax, ~] = size(distancesNgsa);
-
-        plot(linspace(1, Gmax, Gmax), log10(distancesNgsa), '-+m');
-
-        title(strcat("Distances metric for ", problem.name));
+        title(strcat("Distance metric for ", problem.name));
         xlabel("Generation");
-        ylabel("Distances (Log_{10})");
+        ylabel("Distance (Log_{10})");
         legend("NGSA-II distances");
+        
+        % Diversity of solutions
+        subplot(2, 2, 4);
     else
         legend('NGSA-II Pareto front');
+        
+        % Diversity of solutions
+        subplot(2, 2, [3, 4]);
     end
+    
+    plot(linspace(1, Gmax, Gmax), log10(deltaNgsa), '-+');
+    
+    title(strcat("Diversity metric for ", problem.name));
+    xlabel("Generation");
+    ylabel("Delta (Log_{10})");
+    legend("NGSA-II diversity", "Location", "Southeast");
 end
