@@ -53,9 +53,11 @@ function [result, distancesMeans, delta] = ngsa(problem, config)
                 
                 % Sort sorts in ascending order hence the minus.
                 [~, s] = sort(-distances);
-                s = s / (frontCount + 1);
+                
+                bias = zeros(1, frontCount);
+                bias(s) = (1:frontCount) / (frontCount + 1);
 
-                keepIndices(newIndices) = i + s;
+                keepIndices(newIndices) = i + bias;
                 
                 i = i + 1;
                 newPopCount = newPopCount + frontCount;
@@ -74,9 +76,14 @@ function [result, distancesMeans, delta] = ngsa(problem, config)
                 % Find the best ones available.
                 [~, sortedIndices] = mink(-distances, remainingCount);
                 absoluteIndices = frontIndices(sortedIndices);
-
+                                
                 % Add them.
                 remainingInterval = (newPopCount + 1):(newPopCount + length(absoluteIndices));
+                
+                bias = zeros(1, length(distances));
+                bias(sortedIndices) = (1:remainingCount) ./ (remainingCount + 1);
+                keepIndices(remainingInterval) = i + bias(sort(sortedIndices));
+                
                 nextPop(remainingInterval) = absoluteIndices;
                 newPopCount = newPopCount + length(absoluteIndices);
             end
@@ -91,34 +98,29 @@ function [result, distancesMeans, delta] = ngsa(problem, config)
         % Crossover and mutation.
         offspring = simulatedBinaryCrossover(offspring, config.pc, config.crossArgs);
         offspring = polynomialMutation(offspring, config.pm, config.mutationArgs);
-        
-        % Distance computation.
+        pop = strictNarrow(pop, problem.boundaries);
+
+        % Distance and delta computation.
         if (optimalAvailable)
             distances = zeros(N, 1);
             obtainedPareto = zeros(N, problem.objCount);
-            closest = zeros(N, problem.objCount);
 
             for o = 1:problem.objCount
                 obtainedPareto(:, o) = problem.objectives{o}(pop);
             end
-
-            % Find closest optimal values...
+            
+            % Find closest optimal values and compute distances.
             for n = 1:N
-                [closest(n, :), ~] = min(abs(optimalValues - obtainedPareto(n, :)));
-            end
-
-            % ...and compute distances.
-            for n = 1:N
-                distances(n) = min(sum((obtainedPareto(n, :) - closest).^2, 2));
+                distances(n) = min(sum((obtainedPareto(n, :) - optimalValues).^2, 2));
             end
 
             distancesMeans(g) = mean(sqrt(distances));
+        
+        	% Diversity of solutions (delta).
+            [objValues, ranks] = evalPop(pop, problem);
+            delta(g) = computeDiversity(pop(ranks == 1, :), objValues(ranks == 1, :), optimalValues);
         end
         
-        % Diversity of solutions (delta computation).
-        [objValues, ranks] = evalPop(pop, problem);
-        delta(g) = computeDiversity(pop(ranks == 1, :), objValues(ranks == 1, :), optimalValues);
-
         g = g + 1;
     end
     

@@ -15,9 +15,10 @@ function o = zdt6_f1(args)
 end
 
 function o = zdt6_f2(args)
-    o = zdt6_g(args) .* (1 - (zdt6_f1(args) ./ zdt6_g(args)).^2);
+    g = zdt6_g(args);
+    o = g .* (1 - (zdt6_f1(args) ./ g).^2);
 end
 
 function o = zdt6_g(args)
-    o = 1 + 9 .* ((sum(args(:, 2:end), 2) ./ 9).^(0.25));
+    o = 1 + 9 .* (sum(args(:, 2:end), 2) ./ 9).^0.25;
 end
